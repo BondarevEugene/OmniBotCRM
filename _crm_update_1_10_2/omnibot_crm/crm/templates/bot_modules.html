@@ -1,0 +1,21 @@
+<section class="panel pad" id="modules">
+  <div class="eyebrow">PRODUCTS / ONE BOT OR MANY</div>
+  <h2>Продукты и профили параметров</h2>
+  <p class="muted">Один Telegram-бот может вести несколько продуктов. Применение профиля создаёт только список незаполненных полей и черновик продукта. Работающие секреты, цены и доступы не задаются автоматически.</p>
+  <div class="two-col">
+    {% for key, blueprint in blueprints.items() %}
+    <div class="panel pad">
+      <div class="eyebrow">PROFILE / {{ key|upper }}</div>
+      <h3>{{ blueprint.title }}</h3><p class="muted">{{ blueprint.description }}</p>
+      <div class="mini-metric"><span>Рекомендованных полей</span><strong>{{ blueprint.parameters|length }}</strong></div>
+      {% if admin.role=='owner' %}<form method="post" action="/bots/{{ bot.id }}/blueprints/{{ key }}"><input type="hidden" name="token" value="{{ csrf }}"><button class="btn primary">Добавить недостающие поля</button></form>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <h3 class="gap">Продукты этого бота</h3>
+  {% for module in modules %}<div class="config-editor"><div class="config-editor-head"><strong>{{ module.name }}</strong><span class="pill">{{ module.key }}</span><span class="pill">{{ module.status }}</span></div><p class="muted tiny">{{ module.description }}</p>
+    {% if admin.role=='owner' %}<form class="form-grid" method="post" action="/bots/{{ bot.id }}/modules"><input type="hidden" name="token" value="{{ csrf }}"><input type="hidden" name="key" value="{{ module.key }}"><label>Название<input name="name" value="{{ module.name }}" maxlength="120" required></label><label>Состояние<select name="status">{% for state,title in [('draft','Черновик'),('enabled','Включён в реестре'),('paused','Пауза')] %}<option value="{{ state }}" {% if module.status==state %}selected{% endif %}>{{ title }}</option>{% endfor %}</select></label><label class="wide">Описание<input name="description" value="{{ module.description }}" maxlength="2000"></label><button class="btn mini">Сохранить продукт</button></form>{% endif %}
+  </div>{% else %}<p class="empty">Продукты ещё не добавлены.</p>{% endfor %}
+  {% if admin.role=='owner' %}<h3 class="gap">Добавить свой продукт</h3><form class="form-grid" method="post" action="/bots/{{ bot.id }}/modules"><input type="hidden" name="token" value="{{ csrf }}"><label>Ключ<input name="key" pattern="[a-z][a-z0-9_]*" maxlength="80" required placeholder="another_product"></label><label>Название<input name="name" maxlength="120" required></label><label>Состояние<select name="status"><option value="draft">Черновик</option><option value="enabled">Включён в реестре</option><option value="paused">Пауза</option></select></label><label class="wide">Описание<input name="description" maxlength="2000"></label><button class="btn primary">Добавить продукт</button></form>{% endif %}
+  <p class="muted tiny">Статус продукта станет исполняемой настройкой только после подключения кода бота к API конфигурации CRM. Ключ Telegram и клиентская база принадлежат боту; события продукта следует маркировать отдельным ключом продукта.</p>
+</section>

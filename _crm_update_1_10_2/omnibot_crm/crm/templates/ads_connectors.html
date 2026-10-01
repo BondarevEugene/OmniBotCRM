@@ -1,0 +1,35 @@
+<section class="panel pad" id="ads-connectors">
+  <div class="panel-head clean-head"><div><div class="eyebrow">LIVE REPORTING / META + GOOGLE</div><h2>Рекламные кабинеты</h2>
+  <p class="muted">Синхронизация отчётов за последние 30 завершённых дней. Доступ только к чтению статистики; бюджеты и объявления здесь не меняются. Валюту вводите как в рекламном кабинете.</p></div></div>
+  {% for channel in data.channels if channel.platform in ('facebook','instagram','google_ads') %}
+  {% set account = ad_accounts_by_channel.get(channel.id) %}
+  <div class="ads-account">
+    <div class="ads-account-head"><div><span class="eyebrow">{{ channel.platform|upper }} / CHANNEL #{{ channel.id }}</span><h3>{{ channel.account or 'Без названия' }}</h3></div>
+      <span class="pill">{{ ('Синхронизировано' if account.status=='ok' else 'Ошибка' if account.status=='failed' else 'Не синхронизировано') if account else 'Не подключён' }}</span></div>
+    {% if account %}<p class="muted tiny">ID {{ account.external_id }} · {{ account.currency }} · {{ account.api_version }} · {{ 'Автоматически каждый час' if account.enabled else 'Выключено' }} · последняя загрузка {{ account.last_synced_at.strftime('%d.%m.%Y %H:%M UTC') if account.last_synced_at else '—' }}</p>
+      {% if account.last_error %}<p class="alert">{{ account.last_error }}</p>{% endif %}{% endif %}
+    {% if admin.role=='owner' %}
+    <form class="form-grid" method="post" action="/marketing/channels/{{ channel.id }}/ads-account">
+      <input type="hidden" name="token" value="{{ csrf }}">
+      <label>ID рекламного аккаунта<input name="external_id" value="{{ account.external_id if account else '' }}" pattern="[0-9]+" required placeholder="Без act_ и дефисов"></label>
+      <label>Валюта кабинета<input name="currency" value="{{ account.currency if account else 'UAH' }}" maxlength="3" required></label>
+      <label>Версия API<input name="api_version" value="{{ account.api_version if account else ('v25' if channel.platform=='google_ads' else 'v25.0') }}" required></label>
+      {% if channel.platform=='google_ads' %}
+      <label>OAuth Client ID<input name="client_id" value="" autocomplete="off" placeholder="{{ 'Сохранено — оставьте пустым' if account else 'Client ID' }}"></label>
+      <label>OAuth Client Secret<input name="client_secret" type="password" autocomplete="new-password" placeholder="{{ 'Сохранено — оставьте пустым' if account else 'Client Secret' }}"></label>
+      <label>Refresh Token<input name="refresh_token" type="password" autocomplete="new-password" placeholder="{{ 'Сохранено — оставьте пустым' if account else 'Refresh Token' }}"></label>
+      <label>ID управляющего аккаунта (если есть)<input name="login_customer_id" value="" placeholder="Необязательно"></label>
+      {% else %}
+      <label class="wide">Meta Access Token<input name="access_token" type="password" autocomplete="new-password" placeholder="{{ 'Сохранено — оставьте пустым' if account else 'Токен с разрешением ads_read' }}"></label>
+      {% endif %}
+      <label class="check wide"><input type="checkbox" name="enabled" {% if account and account.enabled %}checked{% endif %}> Включить синхронизацию (каждый час в worker)</label>
+      <button class="btn primary">Сохранить кабинет</button>
+    </form>
+    {% if account and account.enabled %}<form method="post" action="/marketing/channels/{{ channel.id }}/sync" class="sync-form"><input type="hidden" name="token" value="{{ csrf }}"><button class="btn mini">Синхронизировать сейчас</button></form>{% endif %}
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="empty">Создайте канал Facebook, Instagram или Google Ads ниже — затем здесь появится подключение кабинета.</p>
+  {% endfor %}
+  <p class="muted tiny">Подтверждённые лиды CRM считаются отдельно от конверсий рекламных кабинетов. Токены зашифрованы и не показываются повторно.</p>
+</section>

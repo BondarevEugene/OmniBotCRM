@@ -1,0 +1,28 @@
+[hidden]{display:none!important}
+.workspace-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;padding:5px 2px 15px;margin:0 0 20px;border-bottom:1px solid var(--line);align-items:center}
+.workspace-tabs a{display:inline-flex;white-space:nowrap;min-height:42px;align-items:center;padding:9px 16px;border-radius:12px;color:var(--muted);font-size:13px;font-weight:700;border:1px solid transparent;transition:background .2s,color .2s,transform .2s}
+.workspace-tabs a:hover{background:color-mix(in srgb,var(--blue) 9%,transparent);color:var(--text);transform:translateY(-1px)}
+.workspace-tabs a.active{color:#fff;background:linear-gradient(120deg,#3e70ce,#765acb);box-shadow:0 9px 22px #5470c650}
+.metric-link{display:block;color:var(--text);text-decoration:none;transition:transform .2s,box-shadow .2s}
+.metric-link:hover{transform:translateY(-3px);box-shadow:0 15px 32px #4e64ab2e}
+.cash-number{font-size:27px;font-weight:760;letter-spacing:-.03em;line-height:1.3;color:var(--text)}
+.cash-number small{font-size:13px;color:var(--muted);font-weight:700}
+.status-value{font-size:19px;font-weight:750;margin:17px 0;color:var(--text)}
+.rate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:15px}
+.rate-item{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--blue) 4%,var(--panel))}
+.rate-item strong{font-size:18px}.rate-item small{color:var(--muted)}
+.incident-line{border-bottom:1px solid var(--line);padding:12px 0}.incident-line p{margin:6px 0}.incident-line small{color:var(--muted)}
+body[data-theme="light"] .workspace-tabs{border-color:#dfe6f4}
+body[data-theme="light"] .rate-item{background:#f8faff;border-color:#e4eaf5}
+.database-table{border:1px solid var(--line);border-radius:14px;margin:10px 0;background:color-mix(in srgb,var(--blue,#5883d7) 4%,var(--panel));overflow:hidden}
+.database-table>summary{cursor:pointer;padding:17px 20px;list-style:none;color:var(--text)}
+.database-table>summary::-webkit-details-marker{display:none}
+.database-table[open]>summary{border-bottom:1px solid var(--line)}
+.database-table .form-grid,.database-table h3{margin:18px 20px}.database-table .table-wrap{margin:0 12px}
+.database-table .mini-metric{margin:0 20px;overflow-wrap:anywhere}
+.env-summary{margin:18px 0}.env-summary .card{padding:18px}.env-summary .value{font-size:26px;margin-top:9px}
+#environment table td{vertical-align:middle}#environment code{font-size:12px;color:var(--text)}
+.analytics-hero{display:flex;justify-content:space-between;gap:16px;align-items:center;border:1px solid var(--line);border-radius:18px;background:linear-gradient(120deg,color-mix(in srgb,var(--blue) 16%,var(--panel)),color-mix(in srgb,#8a72ce 12%,var(--panel)));padding:22px 26px;margin-bottom:16px}.analytics-hero h2{margin:7px 0}.analytics-hero p{color:var(--muted);margin:0}.analytics-metrics{margin-bottom:18px}.analytics-metrics .card a{color:var(--blue)}
+.analytics-legend{display:flex;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:12px}.analytics-legend span{display:flex;align-items:center;gap:6px}.analytics-legend i{width:9px;height:9px;border-radius:50%}.legend-client{background:#5c83e7}.legend-order{background:#9a77dc}.legend-payment{background:#31b9a7}.analytics-chart{display:flex;gap:3px;align-items:flex-end;height:200px;padding:18px 0 0;border-bottom:1px solid var(--line);overflow:hidden}.analytics-day{display:flex;align-items:flex-end;gap:1px;flex:1;height:100%;min-width:4px}.analytics-day i{flex:1;min-height:1px;border-radius:4px 4px 0 0}.analytics-day .client{background:#5c83e7}.analytics-day .order{background:#9a77dc}.analytics-day .payment{background:#31b9a7}.analytics-day:hover{background:color-mix(in srgb,var(--blue) 9%,transparent)}
+@media(max-width:720px){.analytics-hero{align-items:flex-start;flex-direction:column}.analytics-chart{height:160px}.analytics-legend{width:100%}}
+@media(max-width:720px){.workspace-tabs{position:relative;margin-inline:-5px}.workspace-tabs a{min-height:44px;padding:10px 13px}.cash-number{font-size:22px}.heading .actions{flex-wrap:wrap}}

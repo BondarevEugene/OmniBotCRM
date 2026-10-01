@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Пульт бизнеса{% endblock %}
+{% block crumb %}БОТЫ / ПУЛЬТ БИЗНЕСА{% endblock %}
+{% block content %}
+<section class="control-intro"><div><span class="control-eyebrow">OMNIFACTORY / LIVE OPERATIONS</span><h1>Пульт бизнеса</h1><p>Состояние ботов, проверенные поступления и дела, требующие решения. Период: последние 30 дней.</p></div><a class="control-action" href="/finance">Открыть кассовую книгу ↗</a></section>
+<nav class="workspace-tabs" aria-label="Выбор бота"><a href="/control-center" class="{{ 'active' if not selected else '' }}">Все боты</a>{% for bot in bots %}<a class="{{ 'active' if selected==bot.id else '' }}" href="/control-center?bot_id={{ bot.id }}">{{ bot.name }}</a>{% endfor %}</nav>
+{% if not rows %}<div class="card">Боты пока не добавлены. <a href="/bots">Создать бота</a></div>{% endif %}
+{% for row in rows %}
+<article class="control-bot">
+  <header><div><span class="control-eyebrow">{{ row.bot.key }}</span><h2>{{ row.bot.name }}</h2><span class="control-state {{ 'is-on' if row.online else 'is-off' }}">{{ 'Связь есть' if row.online else 'Нет свежего сигнала' }}</span> <small>{{ row.last_seen.strftime('%d.%m.%Y %H:%M UTC') if row.last_seen else 'Сигнал еще не получен' }}</small></div><a class="control-action" href="/bots/{{ row.bot.id }}">Карточка бота ↗</a></header>
+  <div class="control-grid">
+    <div class="control-metric"><small>Клиенты</small><strong>{{ row.clients }}</strong><a href="/customers?bot_id={{ row.bot.id }}">Открыть базу ↗</a></div>
+    <div class="control-metric"><small>Заказы за 30 дней</small><strong>{{ row.orders }}</strong><a href="/commerce?bot_id={{ row.bot.id }}">Коммерция ↗</a></div>
+    <div class="control-metric"><small>Оплаты к проверке</small><strong>{{ row.pending }}</strong><a href="/finance?bot_id={{ row.bot.id }}">Сверка ↗</a></div>
+    <div class="control-metric"><small>Открытые обращения</small><strong>{{ row.tickets }}</strong><a href="/tickets?bot_id={{ row.bot.id }}">Ответить ↗</a></div>
+  </div>
+  <p><a class="control-action" href="/openai?bot_id={{ row.bot.id }}">OpenAI · расход этого бота ↗</a></p>
+  <div class="control-columns">
+    <div class="control-panel"><h3>Проверенные поступления</h3>{% for currency, amount in row.received|dictsort %}<p><b>{{ '%.2f'|format(amount) }} {{ currency }}</b></p>{% else %}<p>Подтвержденных оплат пока нет</p>{% endfor %}<h3>Расходы</h3>{% for currency, amount in row.spent|dictsort %}<p><b>{{ '%.2f'|format(amount) }} {{ currency }}</b></p>{% else %}<p>Расходов пока нет</p>{% endfor %}<a href="/finance?bot_id={{ row.bot.id }}">Детали и курсы валют ↗</a></div>
+    <div class="control-panel"><h3>Конфигурация</h3><p><b>{{ row.config_status }}</b>{% if row.latest %} · версия {{ row.latest.version }}{% endif %}</p>{% if row.applied %}<small>Последний ответ: {{ row.applied.reported_at.strftime('%d.%m.%Y %H:%M UTC') }} · {{ row.applied.status }}{% if row.applied.error %} · {{ row.applied.error }}{% endif %}</small>{% endif %}<p><a href="/bots/{{ row.bot.id }}/configure">Настроить и опубликовать ↗</a></p><h3>Очередь внимания</h3>{% for alert in row.alerts %}<div class="control-alert">{{ alert }}</div>{% else %}<p>Открытых сигналов нет</p>{% endfor %}</div>
+  </div>
+</article>
+{% endfor %}
+{% endblock %}

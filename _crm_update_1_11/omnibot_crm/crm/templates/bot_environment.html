@@ -1,0 +1,16 @@
+<section class="panel pad" id="environment">
+  <div class="eyebrow">FOOD PORN / CONFIGURATION MAP</div>
+  <h2>Карта параметров запуска</h2>
+  <p class="muted">CRM показывает, какие ключи уже заведены. Значения исходного .env не загружаются сюда автоматически. Секреты остаются скрытыми. Изменения начнут влиять на бот после подключения клиента конфигурации в Food_Porn.</p>
+  <div class="cards three env-summary">
+    <div class="card"><div class="card-label">ПЕРЕМЕННЫХ</div><div class="value">{{ env_coverage|length }}</div></div>
+    <div class="card"><div class="card-label">ЗАПОЛНЕНО В CRM</div><div class="value">{{ env_coverage|selectattr('configured')|list|length }}</div></div>
+    <div class="card"><div class="card-label">НА ХОСТЕ БОТА</div><div class="value">{{ env_coverage|selectattr('group','equalto','bootstrap')|list|length }}</div></div>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>ИЗ .ENV</th><th>ПОЛЕ CRM</th><th>НАЗНАЧЕНИЕ</th><th>СОСТОЯНИЕ</th></tr></thead><tbody>
+  {% for item in env_coverage %}<tr><td><code>{{ item.name }}</code></td><td>{{ item.setting or 'Хост бота' }}</td><td>{{ item.note }}</td><td><span class="pill">{{ 'На хосте' if item.group=='bootstrap' else 'Заполнено' if item.configured else 'Требует настройки' }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  <p class="muted tiny">DATABASE_URL бота и DATABASE_URL самой CRM — разные базы. Ключ шифрования CRM и SESSION_SECRET должны оставаться в окружении сервера CRM; иначе сохранённые секреты и сессии станут недоступны.</p>
+  {% if admin.role=='owner' %}<form method="post" action="/bots/{{ bot.id }}/blueprints/food_porn_environment"><input type="hidden" name="token" value="{{ csrf }}"><button class="btn primary">Добавить недостающие поля карты .env</button></form>{% endif %}
+  <a class="btn mini" href="/bots/{{ bot.id }}/configure#settings">Открыть редактор полей →</a>
+</section>

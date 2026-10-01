@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="{{ locale|default('ru') }}">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}OmniFactory CRM{% endblock %} · OmniFactory</title>
+  <link rel="stylesheet" href="/static/style.css?v=19"><link rel="stylesheet" href="/static/light.css?v=19"><link rel="stylesheet" href="/static/workspace.css?v=5">
+</head>
+<body data-theme="{{ theme|default('light') }}">
+{% if admin %}
+<aside class="sidebar">
+  <a class="brand" href="/"><span class="mark">◈</span><span>OMNIFACTORY <small>WORKSPACE / CRM</small></span></a>
+  <div class="workspace-label"><span class="workspace-orb">O</span><span>OmniFactory<br><small>Project workspace</small></span><span>⌄</span></div>
+  <nav>
+    <div class="nav-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+    <a href="/">◫ <span>Панель</span></a><a href="/control-center">◉ <span>Пульт бизнеса</span></a><a href="/reports">▥ <span>Отчеты</span></a>
+    <a href="/analytics">▤ <span>Аналитика</span></a><a href="/m">▣ <span>Смартфон · просмотр</span></a>
+    <div class="nav-label">КЛИЕНТЫ И ПРОЕКТЫ</div>
+    <a href="/customers">♙ <span>Клиенты</span></a><a href="/companies">▦ <span>Компании</span></a>
+    <a href="/pipeline">◇ <span>Воронка</span></a><a href="/projects">▧ <span>Проекты</span></a>
+    <a href="/tickets">⌕ <span>Обращения</span></a><a href="/tasks">☑ <span>Задачи</span></a>
+    <div class="nav-label">КОММЕРЦИЯ И РОСТ</div>
+    <a href="/commerce">◈ <span>Коммерция</span></a><a href="/finance">◉ <span>Финансы / ФОП</span></a><a href="/invoices">▤ <span>Счета</span></a>
+    <a href="/expenses">↘ <span>Расходы</span></a><a href="/marketing">✧ <span>Продвижение / SEO</span></a>
+    <a href="/campaigns">✦ <span>Рассылки</span></a>
+    <div class="nav-label">СИСТЕМЫ</div>
+    <a href="/bots">◇ <span>Боты</span></a><a href="/openai">◈ <span>OpenAI · расходы</span></a><a href="/openai/keys">✣ <span>OpenAI · ключи</span></a><a href="/integrations">⟲ <span>Интеграции</span></a>
+    {% if admin.role=='owner' %}<a href="/audit">◷ <span>Аудит</span></a>{% endif %}
+  </nav>
+  <div class="sidebar-bottom"><span class="status-dot"></span> OMNIFACTORY · ONLINE
+    <form action="/logout" method="post"><input type="hidden" name="token" value="{{ csrf }}"><button class="logout">Выйти · {{ admin.email }}</button></form>
+  </div>
+</aside>
+{% endif %}
+<div class="shell {% if not admin %}auth-shell{% endif %}">
+  {% if admin %}<header class="topbar">
+    <details class="app-mobile-menu"><summary>◈ Меню</summary><div><a href="/">Панель</a><a href="/control-center">Пульт бизнеса</a><a href="/reports">Отчеты</a><a href="/customers">Клиенты</a><a href="/bots">Боты</a><a href="/openai">OpenAI · расходы</a><a href="/marketing">Продвижение</a><a href="/commerce">Коммерция</a><a href="/projects">Проекты</a><a href="/invoices">Счета</a><a href="/expenses">Расходы</a><a href="/m">Таблицы</a></div></details>
+    <div class="crumb">WORKSPACE <span>/</span> {% block crumb %}ОБЗОР{% endblock %}</div>
+    <div class="top-right">
+      <form method="post" action="/preferences" class="quick-pref"><input type="hidden" name="token" value="{{ csrf }}"><input type="hidden" name="locale" value="{{ locale }}"><input type="hidden" name="theme" value="{{ 'dark' if theme=='light' else 'light' }}"><button aria-label="Сменить тему">{{ '☾ Темная' if theme=='light' else '☼ Светлая' }}</button></form>
+      <form method="post" action="/preferences" class="quick-pref"><input type="hidden" name="token" value="{{ csrf }}"><input type="hidden" name="theme" value="{{ theme }}"><input type="hidden" name="locale" value="{{ 'en' if locale=='ru' else 'ru' }}"><button aria-label="Сменить язык">{{ 'EN' if locale=='ru' else 'RU' }}</button></form>
+      <span class="live"><span class="status-dot"></span> LIVE</span><div class="avatar">{{ admin.email[:1]|upper }}</div>
+    </div>
+  </header>{% endif %}
+  <main class="content">{% block content %}{% endblock %}</main>
+  {% if admin %}<nav class="app-bottom"><a href="/">◫<small>Панель</small></a><a href="/customers">♙<small>Клиенты</small></a><a href="/bots">◇<small>Боты</small></a><a href="/marketing">✧<small>Реклама</small></a><a href="/m">▤<small>Таблицы</small></a></nav>{% endif %}
+  {% if admin %}<footer>OMNIFACTORY CRM <span>·</span> PROJECT OPERATIONS PLATFORM</footer>{% endif %}
+</div>
+</body></html>
