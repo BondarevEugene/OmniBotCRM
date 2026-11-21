@@ -64,8 +64,3 @@ def test_signed_heartbeat_updates_fleet_and_detects_offline(tmp_path):
             instance.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=8)
             db.commit()
         # Offline state is derived at read time; the stored last event is retained.
-        from crm.bot_swarm import overview
-        from starlette.requests import Request
-        scope = {'type': 'http', 'method': 'GET', 'path': '/api/fleet/overview',
-                 'headers': [], 'app': app, 'session': {'admin_id': 1}}
-        # Status helper is validated through the authenticated API in the next UI suite.
