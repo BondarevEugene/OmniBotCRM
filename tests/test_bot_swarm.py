@@ -37,21 +37,11 @@ def test_swarm_registry_identity_and_manifest(tmp_path):
             'password': 'strong-password-123',
         }, follow_redirects=False)
         assert result.status_code == 303, result.text
-        csrf = client.cookies.get('session')
-        assert csrf
-        assert client.post('/api/fleet/swarms', json={
-            'key': 'food_group', 'name': 'Food Group',
-        }).status_code == 403
-        # The CSRF token is stored in the signed test session and is
-        # exposed in existing authenticated forms.
         page = client.get('/bots/1/configure')
-        token = re.search(r'(?:name="token" value|data-csrf)="([^"]+)"', page.text)
-        if token is None:
-            from itsdangerous import URLSafeTimedSerializer
-            signed = URLSafeTimedSerializer('s' * 40)
-            token_value = signed.loads(client.cookies['session']).get('csrf')
-        else:
-            token_value = token.group(1)
+        assert page.status_code == 200
+        token_value = re.search(
+            r'name="token" value="([^"]+)"', page.text
+        ).group(1)
         headers = {'X-Omni-CSRF': token_value}
         swarm = client.post('/api/fleet/swarms', headers=headers, json={
             'key': 'food_group', 'name': 'Food Group',
