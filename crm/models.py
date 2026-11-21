@@ -34,6 +34,38 @@ class Bot(Stamp, Base):
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class BotSwarm(Stamp, Base):
+    """Logical fleet group. A swarm never owns a Telegram token."""
+    __tablename__ = 'crm_bot_swarms'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    description: Mapped[str] = mapped_column(Text, default='')
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey('crm_bot_swarms.id'), index=True)
+
+
+class BotSwarmMember(Stamp, Base):
+    """One real Bot may belong to a single swarm in v1."""
+    __tablename__ = 'crm_bot_swarm_members'
+    bot_id: Mapped[int] = mapped_column(ForeignKey('crm_bots.id'), primary_key=True)
+    swarm_id: Mapped[int] = mapped_column(ForeignKey('crm_bot_swarms.id'), index=True, nullable=False)
+
+
+class BotFleetInstance(Stamp, Base):
+    """Identity and observation for an actual deployed Telegram instance."""
+    __tablename__ = 'crm_bot_fleet_instances'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    bot_id: Mapped[int] = mapped_column(ForeignKey('crm_bots.id'), unique=True, nullable=False)
+    telegram_bot_id: Mapped[int | None] = mapped_column(BigInteger, unique=True)
+    deployment_provider: Mapped[str] = mapped_column(String(32), default='external')
+    deployment_ref: Mapped[str] = mapped_column(String(120), default='')
+    runtime_version: Mapped[str] = mapped_column(String(80), default='')
+    status: Mapped[str] = mapped_column(String(20), default='unconnected')
+    last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    manifest_json: Mapped[str] = mapped_column(Text, default='{}')
+    manifest_version: Mapped[int] = mapped_column(Integer, default=1)
+
+
 class BotSetting(Stamp, Base):
     __tablename__ = 'crm_bot_settings'
     __table_args__ = (UniqueConstraint('bot_id', 'key'),)
