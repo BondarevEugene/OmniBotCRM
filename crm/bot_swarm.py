@@ -4,7 +4,6 @@ This registry never provisions infrastructure or accepts bot tokens.
 """
 from __future__ import annotations
 
-import json
 import re
 
 from fastapi import APIRouter, Header, HTTPException, Request
