@@ -30,6 +30,7 @@ from .bot_dialogue import router as bot_dialogue_router
 from .command_center import router as command_center_router
 from .openai_admin import router as openai_router
 from .neon_inventory import router as neon_router
+from .bot_swarm import router as bot_swarm_router
 
 
 def create_app(config: Settings | None = None) -> FastAPI:
@@ -50,6 +51,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
     app.include_router(command_center_router)
     app.include_router(openai_router)
     app.include_router(neon_router)
+    app.include_router(bot_swarm_router)
     app.include_router(web_router)
     app.include_router(workflows_router)
     app.include_router(mobile_router)
