@@ -5,6 +5,7 @@ This registry never provisions infrastructure or accepts bot tokens.
 from __future__ import annotations
 
 import re
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel, Field, model_validator
@@ -72,6 +73,17 @@ def overview(request: Request):
         swarms = db.scalars(select(BotSwarm).order_by(BotSwarm.id)).all()
         instances = db.scalars(select(BotFleetInstance).order_by(BotFleetInstance.id)).all()
         members = db.scalars(select(BotSwarmMember)).all()
+        now = datetime.now(timezone.utc)
+        def effective_status(instance):
+            stamp = instance.last_heartbeat_at
+            if stamp is None:
+                return 'unconnected'
+            if stamp.tzinfo is None:
+                stamp = stamp.replace(tzinfo=timezone.utc)
+            if now - stamp > timedelta(minutes=5):
+                return 'offline'
+            return instance.status
+
         return {
             'swarms': [
                 {'id': s.id, 'key': s.key, 'name': s.name, 'parent_id': s.parent_id,
@@ -80,7 +92,7 @@ def overview(request: Request):
             ],
             'instances': [
                 {'id': i.id, 'bot_id': i.bot_id, 'telegram_bot_id': i.telegram_bot_id,
-                 'status': i.status, 'provider': i.deployment_provider,
+                 'status': effective_status(i), 'provider': i.deployment_provider,
                  'runtime_version': i.runtime_version,
                  'last_heartbeat_at': i.last_heartbeat_at}
                 for i in instances
