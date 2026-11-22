@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
-from .models import Activity, Bot, BotConfigApplied, BotIncident, BotModule, BotPaymentProvider, BotScenario, Customer, Deal, Identity, IngestEvent, MarketingCampaign, MarketingTouch, Order, OrderItem, Payment, PaymentVerification, Pipeline, Product, Stage, Ticket
+from .models import Activity, Bot, BotConfigApplied, BotFleetInstance, BotIncident, BotModule, BotPaymentProvider, BotScenario, Customer, Deal, Identity, IngestEvent, MarketingCampaign, MarketingTouch, Order, OrderItem, Payment, PaymentVerification, Pipeline, Product, Stage, Ticket
 from .acquirers import effective_credentials
 from .bot_settings import setting_value, runtime_settings
 from .config_releases import latest_release, load_release
@@ -188,6 +188,14 @@ async def receive_event(request: Request):
                 raise HTTPException(422, 'Unknown scenario for this bot')
         if typ in ('bot.heartbeat', 'bot.error', 'product.upsert'):
             bot.last_seen_at = datetime.now(timezone.utc)
+            if typ in ('bot.heartbeat', 'bot.error'):
+                fleet = db.scalar(select(BotFleetInstance).where(
+                    BotFleetInstance.bot_id == bot.id))
+                if fleet is not None:
+                    fleet.last_heartbeat_at = bot.last_seen_at
+                    fleet.status = 'degraded' if typ == 'bot.error' else 'running'
+                    if typ == 'bot.heartbeat' and 'runtime_version' in data:
+                        fleet.runtime_version = field(data['runtime_version'], 80)
             if typ == 'bot.error':
                 severity = field(data.get('severity', 'error'), 20, True)
                 if severity not in ('warning', 'error', 'critical'):
